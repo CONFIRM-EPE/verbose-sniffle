@@ -1,0 +1,45 @@
+/**
+ * Christmas voucher forwarder (Google Apps Script)
+ * Forwards ONE specific email from your Gmail to ONE fixed address.
+ * Can be run any number of times (30-second cooldown stops accidental double-taps).
+ */
+
+// ====== EDIT THESE ======
+const VOUCHER_SUBJECT = 'PASTE THE VOUCHER EMAIL SUBJECT HERE';   // part of the subject is enough
+const RECIPIENT       = 'recipient@example.com';                   // the only address it can ever send to
+// ========================
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const last = Number(props.getProperty('lastSent') || 0);
+    if (Date.now() - last < 30000) return out_({ status: 'sent' });   // just sent, don't double up
+
+    const threads = GmailApp.search('subject:"' + VOUCHER_SUBJECT + '"', 0, 1);
+    if (!threads.length) return out_({ status: 'error' });
+
+    const msgs = threads[0].getMessages();
+    msgs[0].forward(RECIPIENT);                       // forwards the original voucher email
+    props.setProperty('lastSent', String(Date.now()));
+    return out_({ status: 'sent' });
+  } catch (err) {
+    return out_({ status: 'error' });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// Visiting the URL in a browser just shows it's alive (never sends anything).
+function doGet() { return out_({ status: 'ok' }); }
+
+function out_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Optional: clears the cooldown if you want to send again immediately.
+function reset() {
+  PropertiesService.getScriptProperties().deleteProperty('lastSent');
+}
