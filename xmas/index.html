@@ -109,8 +109,8 @@
   .note{margin-top:16px;font-size:.95rem;font-weight:600;opacity:.9;min-height:1.4em}
   .note.err{color:#ffb4bc;opacity:1}
   .done{
-    margin-top:8px;padding:16px 22px;border-radius:22px;max-width:24em;
-    background:rgba(255,255,255,.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    margin-top:-14px;padding:16px 22px;border-radius:22px;max-width:24em;
+    background:rgba(11,29,58,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
     border:2px dashed rgba(255,255,255,.55);font-weight:800;font-size:1.1rem;line-height:1.35;
     animation:pop .8s cubic-bezier(.2,1.4,.4,1) both;
   }
@@ -325,7 +325,7 @@ async function sendRequest(){
 }
 
 function showDone(){
-  $("btn").hidden = true; $("note").textContent = "";
+  $("btn").hidden = true; $("note").hidden = true;
   $("sub").textContent = "Surprise! It's yours 🎉";
   const who = CONFIG.from ? `<small>Love, ${CONFIG.from} ❤️</small>` : "";
   $("done").innerHTML = "Check your email inbox 📬" +
